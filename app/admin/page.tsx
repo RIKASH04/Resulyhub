@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         const { data: cls } = await supabase.from('classes').select('id, name').order('name')
         if (!cls) { setLoading(false); return }
 
-        const enriched = await Promise.all(cls.map(async (c) => {
+        const enriched = await Promise.all(cls.map(async (c: { id: string; name: string }) => {
             const [{ count: sc }, { count: stc }] = await Promise.all([
                 supabase.from('subjects').select('id', { count: 'exact', head: true }).eq('class_id', c.id),
                 supabase.from('students').select('id', { count: 'exact', head: true }).eq('class_id', c.id),

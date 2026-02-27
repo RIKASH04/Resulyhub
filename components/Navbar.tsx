@@ -6,7 +6,7 @@ import { BookOpen, LogIn, LayoutDashboard, LogOut, ChevronRight } from 'lucide-r
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import type { User } from '@supabase/supabase-js'
+import type { User, Session } from '@supabase/supabase-js'
 import { ADMIN_EMAIL } from '@/lib/constants'
 
 export default function Navbar() {
@@ -16,11 +16,11 @@ export default function Navbar() {
     const supabase = createClient()
 
     useEffect(() => {
-        supabase.auth.getUser().then(({ data }) => {
+        supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
             setUser(data.user)
             setLoading(false)
         })
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
             setUser(session?.user ?? null)
         })
         return () => subscription.unsubscribe()

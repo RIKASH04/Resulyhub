@@ -175,7 +175,7 @@ export default function ClassDetailPage() {
     const openEditStudent = async (student: Student) => {
         const { data: mks } = await supabase.from('marks').select('subject_id,marks_obtained').eq('student_id', student.id)
         const map: Record<string, number> = {}
-        mks?.forEach(m => { map[m.subject_id] = m.marks_obtained })
+        mks?.forEach((m: { subject_id: string; marks_obtained: number }) => { map[m.subject_id] = m.marks_obtained })
         subjects.forEach(s => { if (map[s.id] === undefined) map[s.id] = 0 })
         setEditMarks(map)
         setEditStudent(student)
