@@ -249,7 +249,7 @@ export default function ResultPage() {
                                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                             >
                                 {/* Print Header */}
-                                <div className="card" style={{ padding: '2.5rem', border: '2px solid var(--border)' }}>
+                                <div className="card" style={{ padding: 'clamp(1rem, 4vw, 2.5rem)', border: '2px solid var(--border)' }}>
                                     {/* Institution Header */}
                                     <div style={{ textAlign: 'center', borderBottom: '2px solid var(--primary)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
                                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
@@ -259,7 +259,7 @@ export default function ResultPage() {
                                                 color: 'white', fontWeight: 800, fontSize: '1.5rem'
                                             }}>R</div>
                                         </div>
-                                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.01em' }}>Hidayathul Islam Madrasa Purusharakatte - 9798</h2>
+                                        <h2 style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.01em', lineHeight: 1.3 }}>Hidayathul Islam Madrasa Purusharakatte - 9798</h2>
                                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.2rem' }}>Official Academic Result Portal</p>
                                         <div style={{
                                             display: 'inline-block', marginTop: '0.75rem',
@@ -336,11 +336,12 @@ export default function ResultPage() {
 
                                     {/* Summary */}
                                     <div style={{
-                                        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-                                        gap: '1rem',
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(2, 1fr)',
+                                        gap: '0.85rem',
                                         background: summary.status === 'Pass' ? 'var(--success-light)' : 'var(--danger-light)',
                                         border: `1.5px solid ${summary.status === 'Pass' ? '#A7F3D0' : '#FECACA'}`,
-                                        borderRadius: 'var(--radius-md)', padding: '1.25rem'
+                                        borderRadius: 'var(--radius-md)', padding: '1rem'
                                     }}>
                                         {[
                                             { label: 'Total Marks', value: `${summary.total} / ${summary.max_total}` },
@@ -349,11 +350,11 @@ export default function ResultPage() {
                                             { label: 'Result', value: summary.status },
                                         ].map(item => (
                                             <div key={item.label} style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{item.label}</div>
+                                                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{item.label}</div>
                                                 <div style={{
-                                                    fontSize: '1.3rem', fontWeight: 800,
+                                                    fontSize: 'clamp(1rem, 3vw, 1.3rem)', fontWeight: 800,
                                                     color: summary.status === 'Pass' ? '#065F46' : '#991B1B',
-                                                    marginTop: '0.2rem'
+                                                    marginTop: '0.2rem', wordBreak: 'break-word'
                                                 }}>{item.value}</div>
                                             </div>
                                         ))}

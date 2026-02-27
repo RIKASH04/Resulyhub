@@ -81,10 +81,10 @@ export default function AdminDashboard() {
 
     return (
         <PageTransition>
-            <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', overflowX: 'hidden' }}>
                 {/* Header */}
                 <div style={{ marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
                         <div>
                             <h1 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                                 <LayoutDashboard size={22} color="var(--primary)" />
