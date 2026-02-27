@@ -84,9 +84,9 @@ export default function AdminDashboard() {
             <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', overflowX: 'hidden' }}>
                 {/* Header */}
                 <div style={{ marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                         <div>
-                            <h1 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <h1 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: 'clamp(1.1rem, 5vw, 1.5rem)' }}>
                                 <LayoutDashboard size={22} color="var(--primary)" />
                                 Admin Dashboard
                             </h1>
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid-3" style={{ marginBottom: '2rem' }}>
+                <div className="grid-responsive-2" style={{ marginBottom: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
                     {[
                         { icon: School, label: 'Total Classes', value: stats.classes, color: 'var(--primary)' },
                         { icon: Users, label: 'Total Students', value: stats.students, color: 'var(--success)' },
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
                     </h2>
 
                     {loading ? (
-                        <div className="grid-4">
+                        <div className="grid-responsive-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
                             {Array(8).fill(0).map((_, i) => (
                                 <div key={i} className="skeleton" style={{ height: 130, borderRadius: 'var(--radius-lg)' }} />
                             ))}
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                             <p>No classes yet. Create classes using the setup panel above.</p>
                         </div>
                     ) : (
-                        <div className="grid-4">
+                        <div className="grid-responsive-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
                             <AnimatePresence>
                                 {classes.map((cls, i) => (
                                     <motion.div key={cls.id}

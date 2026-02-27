@@ -272,9 +272,8 @@ export default function ResultPage() {
                                     </div>
 
                                     {/* Student Info Grid */}
-                                    <div style={{
-                                        display: 'grid', gridTemplateColumns: '1fr 1fr',
-                                        gap: '0.85rem', marginBottom: '1.75rem',
+                                    <div className="grid-responsive-2" style={{
+                                        marginBottom: '1.75rem',
                                         background: 'var(--bg)', padding: '1.25rem',
                                         borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)'
                                     }}>
@@ -335,10 +334,7 @@ export default function ResultPage() {
                                     </div>
 
                                     {/* Summary */}
-                                    <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(2, 1fr)',
-                                        gap: '0.85rem',
+                                    <div className="grid-responsive-2" style={{
                                         background: summary.status === 'Pass' ? 'var(--success-light)' : 'var(--danger-light)',
                                         border: `1.5px solid ${summary.status === 'Pass' ? '#A7F3D0' : '#FECACA'}`,
                                         borderRadius: 'var(--radius-md)', padding: '1rem'

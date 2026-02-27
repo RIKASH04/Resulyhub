@@ -211,12 +211,12 @@ export default function ClassDetailPage() {
         <PageTransition>
             <div style={{ maxWidth: 960, margin: '0 auto' }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
                     <Link href="/admin" className="btn btn-ghost btn-sm">
                         <ArrowLeft size={16} /> Back
                     </Link>
                     <div>
-                        <h1 className="section-title">{loading ? '...' : className}</h1>
+                        <h1 className="section-title" style={{ fontSize: 'clamp(1.1rem, 5vw, 1.5rem)' }}>{loading ? '...' : className}</h1>
                         <p className="section-subtitle">Manage subjects and students</p>
                     </div>
                 </div>
@@ -262,7 +262,7 @@ export default function ClassDetailPage() {
                                     <motion.div className="card" style={{ marginBottom: '1.25rem' }}
                                         initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
                                         <form onSubmit={handleAddSubject}>
-                                            <div className="grid-2" style={{ marginBottom: '1rem' }}>
+                                            <div className="grid-responsive-2" style={{ marginBottom: '1rem' }}>
                                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                                     <label className="form-label">Subject Name</label>
                                                     <input className="form-input" placeholder="e.g. Mathematics" value={subjectName}
@@ -435,7 +435,7 @@ export default function ClassDetailPage() {
                 {/* ── Add Student Modal ── */}
                 <Modal isOpen={showAddStudent} onClose={() => setShowAddStudent(false)} title="Add New Student" maxWidth="640px">
                     <form onSubmit={handleAddStudent}>
-                        <div className="grid-2">
+                        <div className="grid-responsive-2">
                             <div className="form-group">
                                 <label className="form-label">Full Name</label>
                                 <input className="form-input" placeholder="Student's full name" value={studentName}
@@ -453,7 +453,7 @@ export default function ClassDetailPage() {
                             Enter Marks
                         </p>
 
-                        <div className="grid-2">
+                        <div className="grid-responsive-2">
                             {subjects.map(s => (
                                 <div key={s.id} className="form-group">
                                     <label className="form-label">{s.name} (Max: {s.max_marks})</label>
@@ -482,7 +482,7 @@ export default function ClassDetailPage() {
                             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
                                 Register: <strong style={{ color: 'var(--text-primary)' }}>{editStudent.register_number}</strong>
                             </p>
-                            <div className="grid-2">
+                            <div className="grid-responsive-2">
                                 {subjects.map(s => (
                                     <div key={s.id} className="form-group">
                                         <label className="form-label">{s.name} (Max: {s.max_marks})</label>
