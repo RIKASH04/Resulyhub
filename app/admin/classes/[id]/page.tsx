@@ -141,7 +141,7 @@ export default function ClassDetailPage() {
         if (subjects.length === 0) { showMsg('error', 'Add at least one subject before adding students.'); return }
         setStudentSaving(true)
         const { data: existing } = await supabase.from('students').select('id').eq('register_number', studentReg.trim().toUpperCase()).maybeSingle()
-        if (existing) { showMsg('error', 'Register number already exists!'); setStudentSaving(false); return }
+        if (existing) { showMsg('error', 'Admission number already exists!'); setStudentSaving(false); return }
 
         const { data: newStudent, error } = await supabase
             .from('students')
@@ -355,7 +355,7 @@ export default function ClassDetailPage() {
                                             <tr>
                                                 <th>#</th>
                                                 <th>Student Name</th>
-                                                <th>Register No.</th>
+                                                <th>Admission No.</th>
                                                 <th style={{ textAlign: 'center' }}>Total</th>
                                                 <th style={{ textAlign: 'center' }}>%</th>
                                                 <th style={{ textAlign: 'center' }}>Grade</th>
@@ -442,8 +442,8 @@ export default function ClassDetailPage() {
                                     onChange={e => setStudentName(e.target.value)} required />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Register Number</label>
-                                <input className="form-input" placeholder="e.g. REG2024001" value={studentReg}
+                                <label className="form-label">Admission Number</label>
+                                <input className="form-input" placeholder="e.g. ADM2024001" value={studentReg}
                                     onChange={e => setStudentReg(e.target.value)} required style={{ textTransform: 'uppercase' }} />
                             </div>
                         </div>
@@ -480,7 +480,7 @@ export default function ClassDetailPage() {
                     {editStudent && (
                         <form onSubmit={handleSaveEdit}>
                             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-                                Register: <strong style={{ color: 'var(--text-primary)' }}>{editStudent.register_number}</strong>
+                                Admission No: <strong style={{ color: 'var(--text-primary)' }}>{editStudent.register_number}</strong>
                             </p>
                             <div className="grid-responsive-2">
                                 {subjects.map(s => (

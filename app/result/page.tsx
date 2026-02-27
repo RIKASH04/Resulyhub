@@ -62,7 +62,7 @@ export default function ResultPage() {
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!registerNumber.trim()) {
-            setError('Please enter a Register Number.')
+            setError('Please enter an Admission Number.')
             return
         }
         setLoading(true)
@@ -87,7 +87,7 @@ export default function ResultPage() {
                 return
             }
             if (!studentData) {
-                setError('No result found for this Register Number. Please check and try again.')
+                setError('No result found for this Admission Number. Please check and try again.')
                 setLoading(false)
                 return
             }
@@ -183,14 +183,14 @@ export default function ResultPage() {
                                 Check Your Result
                             </h1>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                                Enter your Register Number to view your marksheet
+                                Enter your Admission Number to view your marksheet
                             </p>
                         </div>
 
                         <div className="card" style={{ maxWidth: '480px', margin: '0 auto 2.5rem' }}>
                             <form onSubmit={handleSearch}>
                                 <div className="form-group" style={{ marginBottom: '1rem' }}>
-                                    <label className="form-label">Register Number</label>
+                                    <label className="form-label">Admission Number</label>
                                     <div style={{ position: 'relative' }}>
                                         <Search size={16} style={{
                                             position: 'absolute', left: '0.9rem', top: '50%',
@@ -199,7 +199,7 @@ export default function ResultPage() {
                                         <input
                                             type="text"
                                             className="form-input"
-                                            placeholder="e.g. REG2024001"
+                                            placeholder="e.g. ADM2024001"
                                             style={{ paddingLeft: '2.5rem', textTransform: 'uppercase' }}
                                             value={registerNumber}
                                             onChange={e => setRegisterNumber(e.target.value)}
@@ -272,22 +272,23 @@ export default function ResultPage() {
                                     </div>
 
                                     {/* Student Info Grid */}
-                                    <div className="grid-responsive-2" style={{
-                                        marginBottom: '1.75rem',
+                                    <div style={{
+                                        display: 'grid', gridTemplateColumns: '1fr 1fr',
+                                        gap: '1rem', marginBottom: '1.75rem',
                                         background: 'var(--bg)', padding: '1.25rem',
                                         borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)'
                                     }}>
                                         {[
                                             { icon: User, label: 'Student Name', value: student.name },
-                                            { icon: Hash, label: 'Register Number', value: student.register_number },
+                                            { icon: Hash, label: 'Admission Number', value: student.register_number },
                                             { icon: School, label: 'Class', value: student.classes?.name || '—' },
                                             { icon: Calendar, label: 'Academic Year', value: '2025–2026' },
                                         ].map(({ icon: Icon, label, value }) => (
                                             <div key={label} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
                                                 <Icon size={15} color="var(--primary)" style={{ marginTop: 2, flexShrink: 0 }} />
                                                 <div>
-                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
-                                                    <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{value}</div>
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+                                                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>{value}</div>
                                                 </div>
                                             </div>
                                         ))}
@@ -334,7 +335,10 @@ export default function ResultPage() {
                                     </div>
 
                                     {/* Summary */}
-                                    <div className="grid-responsive-2" style={{
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr',
+                                        gap: '1rem',
                                         background: summary.status === 'Pass' ? 'var(--success-light)' : 'var(--danger-light)',
                                         border: `1.5px solid ${summary.status === 'Pass' ? '#A7F3D0' : '#FECACA'}`,
                                         borderRadius: 'var(--radius-md)', padding: '1rem'
