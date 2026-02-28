@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/client'
+import { calculateSummary, MARKS_MAX, PASS_MARK } from '@/lib/constants'
 import { Search, Printer, AlertCircle, GraduationCap, User, Hash, School, Calendar } from 'lucide-react'
 
 interface Subject { id: string; name: string; max_marks: number }
@@ -25,39 +26,6 @@ export default function ResultPage() {
     const [searched, setSearched] = useState(false)
     const printRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
-
-    const calculateSummary = (marks: Mark[]): ResultSummary => {
-        let totalMarks = 0
-        let maxTotalMarks = 0
-        let passedSubjects = 0
-        const totalSubjects = marks.length
-
-        marks.forEach(mark => {
-            totalMarks += mark.marks_obtained
-            maxTotalMarks += mark.subjects.max_marks
-            const percentage = (mark.marks_obtained / mark.subjects.max_marks) * 100
-            if (percentage >= 60) { // Assuming 60% is passing
-                passedSubjects++
-            }
-        })
-
-        const overallPercentage = maxTotalMarks > 0 ? (totalMarks / maxTotalMarks) * 100 : 0
-        let grade = 'F'
-        if (overallPercentage >= 90) grade = 'A+'
-        else if (overallPercentage >= 80) grade = 'A'
-        else if (overallPercentage >= 70) grade = 'B'
-        else if (overallPercentage >= 60) grade = 'C'
-
-        const status = passedSubjects === totalSubjects ? 'Pass' : 'Fail'
-
-        return {
-            total: totalMarks,
-            max_total: maxTotalMarks,
-            percentage: overallPercentage,
-            grade: grade,
-            status: status,
-        }
-    }
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -122,7 +90,10 @@ export default function ResultPage() {
             if (!summaryData) {
                 console.warn('Result summary not found in DB, computing on-the-fly.')
                 if (marksData && marksData.length > 0) {
-                    finalSummary = calculateSummary(marksData as Mark[])
+                    const arr = (marksData as Mark[]).map(m => m.marks_obtained)
+                    const maxArr = (marksData as Mark[]).map(() => MARKS_MAX)
+                    const c = calculateSummary(arr, maxArr)
+                    finalSummary = { total: c.total, max_total: c.maxTotal, percentage: c.percentage, grade: c.grade, status: c.status }
                 } else {
                     setError('No marks found for this student. Please contact the administrator.')
                     setLoading(false)
@@ -146,8 +117,9 @@ export default function ResultPage() {
             }
             setStudent(completeStudent)
 
-        } catch (err: any) {
-            console.error('An unexpected error occurred during search:', err.message)
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err)
+            console.error('An unexpected error occurred during search:', msg)
             setError('An unexpected error occurred. Please try again.')
         } finally {
             setLoading(false)
@@ -160,7 +132,8 @@ export default function ResultPage() {
 
     const getGradeColor = (grade: string) => {
         if (grade === 'A+' || grade === 'A') return 'var(--success)'
-        if (grade === 'B' || grade === 'C') return 'var(--warning)'
+        if (grade === 'B+' || grade === 'B' || grade === 'C+') return 'var(--warning)'
+        if (grade === 'C') return 'var(--warning)'
         return 'var(--danger)'
     }
 
@@ -309,9 +282,9 @@ export default function ResultPage() {
                                             </thead>
                                             <tbody>
                                                 {student.marks?.map((mark, idx) => {
-                                                    const pct = (mark.marks_obtained / mark.subjects.max_marks) * 100
-                                                    const subGrade = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : 'F'
-                                                    const subPass = pct >= 60
+                                                    const m = mark.marks_obtained
+                                                    const subPass = m >= PASS_MARK
+                                                    const subGrade = m >= 45 ? 'A+' : m >= 40 ? 'A' : m >= 35 ? 'B+' : m >= 30 ? 'B' : m >= 25 ? 'C+' : m >= PASS_MARK ? 'C' : 'D'
                                                     return (
                                                         <motion.tr key={mark.subject_id}
                                                             initial={{ opacity: 0, x: -10 }}
@@ -319,8 +292,8 @@ export default function ResultPage() {
                                                             transition={{ delay: idx * 0.05 }}>
                                                             <td style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{idx + 1}</td>
                                                             <td style={{ fontWeight: 600 }}>{mark.subjects.name}</td>
-                                                            <td style={{ textAlign: 'center' }}>{mark.subjects.max_marks}</td>
-                                                            <td style={{ textAlign: 'center', fontWeight: 700 }}>{mark.marks_obtained}</td>
+                                                            <td style={{ textAlign: 'center' }}>{MARKS_MAX}</td>
+                                                            <td style={{ textAlign: 'center', fontWeight: 700, color: subPass ? 'var(--text-primary)' : '#991B1B' }}>{m}</td>
                                                             <td style={{ textAlign: 'center' }}>
                                                                 <span className="badge badge-grade" style={{ color: getGradeColor(subGrade), background: `${getGradeColor(subGrade)}15` }}>{subGrade}</span>
                                                             </td>
@@ -345,9 +318,9 @@ export default function ResultPage() {
                                     }}>
                                         {[
                                             { label: 'Total Marks', value: `${summary.total} / ${summary.max_total}` },
-                                            { label: 'Percentage', value: `${summary.percentage.toFixed(1)}%` },
+                                            { label: 'Average', value: `${(summary.total / (student.marks.length || 1)).toFixed(1)}` },
                                             { label: 'Grade', value: summary.grade },
-                                            { label: 'Result', value: summary.status },
+                                            { label: 'Result', value: summary.status.toUpperCase() },
                                         ].map(item => (
                                             <div key={item.label} style={{ textAlign: 'center' }}>
                                                 <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{item.label}</div>

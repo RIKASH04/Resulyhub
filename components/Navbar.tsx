@@ -19,7 +19,8 @@ export default function Navbar() {
     const supabase = createClient()
 
     useEffect(() => {
-        setIsMenuOpen(false)
+        const id = setTimeout(() => setIsMenuOpen(false), 0)
+        return () => clearTimeout(id)
     }, [pathname])
 
     useEffect(() => {
@@ -48,7 +49,7 @@ export default function Navbar() {
 
     const isAdmin = user?.email === ADMIN_EMAIL
 
-    const NavItems = () => (
+    const renderNavItems = () => (
         <>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link href="/result" className="btn btn-secondary btn-sm" style={{ gap: '0.4rem', width: '100%' }}>
@@ -107,7 +108,7 @@ export default function Navbar() {
 
                 {/* Desktop Nav */}
                 <div className="nav-desktop">
-                    <NavItems />
+                    {renderNavItems()}
                 </div>
 
                 {/* Mobile Toggle */}
@@ -145,7 +146,7 @@ export default function Navbar() {
                                 </button>
                             </div>
                             <div className="nav-mobile-content">
-                                <NavItems />
+                                {renderNavItems()}
                             </div>
                         </motion.div>
                     </>

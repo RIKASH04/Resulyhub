@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import { Search, ShieldCheck, GraduationCap, ArrowRight, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
+import type { User } from '@supabase/supabase-js'
 
 const FU = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
@@ -24,10 +25,10 @@ const features = [
 
 export default function HomePage() {
   const supabase = createClient()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: { data: { user: any } }) => setUser(data.user))
+    supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => setUser(data.user))
   }, [])
 
   const handleAdminLogin = async () => {

@@ -1,29 +1,26 @@
 export const ADMIN_EMAIL = 'resulthub001@gmail.com'
 
-export const GRADE_THRESHOLDS = {
-    A_PLUS: 90,
-    A: 80,
-    B: 70,
-    C: 60,
-} as const
+export const MARKS_MAX = 50
+export const PASS_MARK = 18
 
-export function calculateGrade(percentage: number): string {
-    if (percentage >= GRADE_THRESHOLDS.A_PLUS) return 'A+'
-    if (percentage >= GRADE_THRESHOLDS.A) return 'A'
-    if (percentage >= GRADE_THRESHOLDS.B) return 'B'
-    if (percentage >= GRADE_THRESHOLDS.C) return 'C'
-    return 'F'
+export function calculateGradeFromAverage(avg: number): string {
+    if (avg >= 45) return 'A+'
+    if (avg >= 40) return 'A'
+    if (avg >= 35) return 'B+'
+    if (avg >= 30) return 'B'
+    if (avg >= 25) return 'C+'
+    if (avg >= PASS_MARK) return 'C'
+    return 'D'
 }
 
-export function calculatePassFail(percentage: number): 'Pass' | 'Fail' {
-    return percentage >= GRADE_THRESHOLDS.C ? 'Pass' : 'Fail'
-}
-
-export function calculateSummary(marks: number[], maxMarks: number[]) {
+export function calculateSummary(marks: number[], _maxMarks: number[]) {
+    const failSubject = marks.some(m => m < PASS_MARK)
     const total = marks.reduce((acc, m) => acc + m, 0)
-    const maxTotal = maxMarks.reduce((acc, m) => acc + m, 0)
+    const count = marks.length || 1
+    const avg = total / count
+    const maxTotal = count * MARKS_MAX
     const percentage = maxTotal > 0 ? (total / maxTotal) * 100 : 0
-    const grade = calculateGrade(percentage)
-    const status = calculatePassFail(percentage)
+    const grade = failSubject ? 'D' : calculateGradeFromAverage(avg)
+    const status = failSubject ? 'Fail' : 'Pass'
     return { total, maxTotal, percentage: Math.round(percentage * 100) / 100, grade, status }
 }

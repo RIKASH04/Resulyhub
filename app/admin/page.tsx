@@ -61,8 +61,9 @@ export default function AdminDashboard() {
             if (error) throw error
             setCreateMsg(`✓ Classes created successfully!`)
             await fetchClasses()
-        } catch (e: any) {
-            setCreateMsg(`Error: ${e.message}`)
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e)
+            setCreateMsg(`Error: ${msg}`)
         }
         setCreating(false)
     }

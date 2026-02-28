@@ -11,7 +11,7 @@ import {
 import Link from 'next/link'
 import Modal from '@/components/Modal'
 import PageTransition from '@/components/PageTransition'
-import { calculateSummary } from '@/lib/constants'
+import { calculateSummary, MARKS_MAX, PASS_MARK } from '@/lib/constants'
 
 interface Subject { id: string; name: string; max_marks: number }
 interface Mark { subject_id: string; marks_obtained: number }
@@ -37,7 +37,7 @@ export default function ClassDetailPage() {
     // Subject form
     const [showSubjectForm, setShowSubjectForm] = useState(false)
     const [subjectName, setSubjectName] = useState('')
-    const [subjectMax, setSubjectMax] = useState(100)
+    const [subjectMax, setSubjectMax] = useState(MARKS_MAX)
     const [subjectSaving, setSubjectSaving] = useState(false)
 
     // Student form
@@ -97,13 +97,16 @@ export default function ClassDetailPage() {
         setLoading(false)
     }, [classId])
 
-    useEffect(() => { fetchData() }, [fetchData])
+    useEffect(() => {
+        const id = setTimeout(() => { fetchData() }, 0)
+        return () => clearTimeout(id)
+    }, [fetchData])
 
     // Reset marks input when subjects load
     useEffect(() => {
         const defaults: Record<string, number> = {}
         subjects.forEach(s => { defaults[s.id] = 0 })
-        setMarksInput(defaults)
+        setTimeout(() => setMarksInput(defaults), 0)
     }, [subjects])
 
     // ── Subject Operations ──
@@ -111,9 +114,9 @@ export default function ClassDetailPage() {
         e.preventDefault()
         if (!subjectName.trim()) return
         setSubjectSaving(true)
-        const { error } = await supabase.from('subjects').insert({ class_id: classId, name: subjectName.trim(), max_marks: subjectMax })
+        const { error } = await supabase.from('subjects').insert({ class_id: classId, name: subjectName.trim(), max_marks: MARKS_MAX })
         if (error) showMsg('error', error.message)
-        else { showMsg('success', 'Subject added!'); setSubjectName(''); setSubjectMax(100); setShowSubjectForm(false); await fetchData() }
+        else { showMsg('success', 'Subject added!'); setSubjectName(''); setSubjectMax(MARKS_MAX); setShowSubjectForm(false); await fetchData() }
         setSubjectSaving(false)
     }
 
@@ -270,9 +273,12 @@ export default function ClassDetailPage() {
                                                 </div>
                                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                                     <label className="form-label">Max Marks</label>
-                                                    <input type="number" className="form-input" min={1} max={200} value={subjectMax}
-                                                        onChange={e => setSubjectMax(Number(e.target.value))} required />
+                                                    <input type="number" className="form-input" min={MARKS_MAX} max={MARKS_MAX} value={subjectMax}
+                                                        onChange={e => setSubjectMax(Number(e.target.value))} required disabled />
                                                 </div>
+                                            </div>
+                                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                                                Maximum marks: {MARKS_MAX} | Pass mark: {PASS_MARK}
                                             </div>
                                             <div style={{ display: 'flex', gap: '0.75rem' }}>
                                                 <motion.button type="submit" className="btn btn-success btn-sm" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} disabled={subjectSaving}>
@@ -413,7 +419,10 @@ export default function ClassDetailPage() {
                                                                                     borderRadius: 8, padding: '0.6rem 1rem', minWidth: 120
                                                                                 }}>
                                                                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{sub.name}</div>
-                                                                                    <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{m?.marks_obtained ?? 0}<span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/{sub.max_marks}</span></div>
+                                                                                    <div style={{ fontSize: '1.1rem', fontWeight: 700, color: (m?.marks_obtained ?? 0) < PASS_MARK ? '#991B1B' : 'var(--text-primary)' }}>
+                                                                                        {m?.marks_obtained ?? 0}
+                                                                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>/{MARKS_MAX}</span>
+                                                                                    </div>
                                                                                 </div>
                                                                             )
                                                                         })}
@@ -449,15 +458,18 @@ export default function ClassDetailPage() {
                         </div>
 
                         <hr className="divider" />
-                        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        <p style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             Enter Marks
+                        </p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                            Maximum marks: {MARKS_MAX} | Pass mark: {PASS_MARK}
                         </p>
 
                         <div className="grid-responsive-2">
                             {subjects.map(s => (
                                 <div key={s.id} className="form-group">
-                                    <label className="form-label">{s.name} (Max: {s.max_marks})</label>
-                                    <input type="number" className="form-input" min={0} max={s.max_marks}
+                                    <label className="form-label">{s.name} (Max: {MARKS_MAX})</label>
+                                    <input type="number" className="form-input" min={0} max={MARKS_MAX}
                                         value={marksInput[s.id] ?? 0}
                                         onChange={e => setMarksInput(prev => ({ ...prev, [s.id]: Number(e.target.value) }))} />
                                 </div>
@@ -485,8 +497,8 @@ export default function ClassDetailPage() {
                             <div className="grid-responsive-2">
                                 {subjects.map(s => (
                                     <div key={s.id} className="form-group">
-                                        <label className="form-label">{s.name} (Max: {s.max_marks})</label>
-                                        <input type="number" className="form-input" min={0} max={s.max_marks}
+                                        <label className="form-label">{s.name} (Max: {MARKS_MAX})</label>
+                                        <input type="number" className="form-input" min={0} max={MARKS_MAX}
                                             value={editMarks[s.id] ?? 0}
                                             onChange={e => setEditMarks(prev => ({ ...prev, [s.id]: Number(e.target.value) }))} />
                                     </div>
