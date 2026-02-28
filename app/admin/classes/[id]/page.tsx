@@ -16,7 +16,7 @@ import { calculateSummary, MARKS_MAX, PASS_MARK } from '@/lib/constants'
 interface Subject { id: string; name: string; max_marks: number }
 interface Mark { subject_id: string; marks_obtained: number }
 interface Student {
-    id: string; name: string; register_number: string;
+    id: string; name: string; register_number: string; father_name?: string; photo_url?: string;
     result_summary?: { total: number; max_total: number; percentage: number; grade: string; status: string }[]
 }
 
@@ -44,6 +44,9 @@ export default function ClassDetailPage() {
     const [showAddStudent, setShowAddStudent] = useState(false)
     const [studentName, setStudentName] = useState('')
     const [studentReg, setStudentReg] = useState('')
+    const [studentFather, setStudentFather] = useState('')
+    const [photoFile, setPhotoFile] = useState<File | null>(null)
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null)
     const [marksInput, setMarksInput] = useState<Record<string, number>>({})
     const [studentSaving, setStudentSaving] = useState(false)
 
@@ -65,11 +68,25 @@ export default function ClassDetailPage() {
 
     const fetchData = useCallback(async () => {
         setLoading(true)
-        const [{ data: cls }, { data: subs }, { data: rawStuds }] = await Promise.all([
+        const [{ data: cls }, { data: subs }] = await Promise.all([
             supabase.from('classes').select('name').eq('id', classId).single(),
             supabase.from('subjects').select('id,name,max_marks').eq('class_id', classId).order('name'),
-            supabase.from('students').select('id,name,register_number').eq('class_id', classId).order('name'),
         ])
+        // Students with graceful fallback if new columns are missing
+        let rawStuds: any[] | null = null
+        let studErr: any = null
+        const attempt1 = await supabase.from('students')
+            .select('id,name,register_number,father_name,photo_url')
+            .eq('class_id', classId).order('name')
+        if (attempt1.error) {
+            studErr = attempt1.error
+            const attempt2 = await supabase.from('students')
+                .select('id,name,register_number')
+                .eq('class_id', classId).order('name')
+            rawStuds = attempt2.data || []
+        } else {
+            rawStuds = attempt1.data || []
+        }
         if (cls) setClassName(cls.name)
         setSubjects(subs || [])
 
@@ -138,6 +155,29 @@ export default function ClassDetailPage() {
         }, { onConflict: 'student_id' })
     }
 
+    // Compress image (client-side) to keep storage small
+    const compressImage = (file: File, maxW = 256, quality = 0.7): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image()
+            const reader = new FileReader()
+            reader.onload = () => {
+                img.onload = () => {
+                    const canvas = document.createElement('canvas')
+                    const scale = Math.min(1, maxW / img.width)
+                    canvas.width = Math.max(1, Math.round(img.width * scale))
+                    canvas.height = Math.max(1, Math.round(img.height * scale))
+                    const ctx = canvas.getContext('2d')
+                    if (!ctx) return reject(new Error('Canvas not supported'))
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                    canvas.toBlob(b => b ? resolve(b) : reject(new Error('Compression failed')), 'image/jpeg', quality)
+                }
+                img.src = reader.result as string
+            }
+            reader.onerror = reject
+            reader.readAsDataURL(file)
+        })
+    }
+
     const handleAddStudent = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!studentName.trim() || !studentReg.trim()) return
@@ -148,10 +188,25 @@ export default function ClassDetailPage() {
 
         const { data: newStudent, error } = await supabase
             .from('students')
-            .insert({ class_id: classId, name: studentName.trim(), register_number: studentReg.trim().toUpperCase() })
+            .insert({ class_id: classId, name: studentName.trim(), register_number: studentReg.trim().toUpperCase(), father_name: studentFather.trim() || null })
             .select('id').single()
 
         if (error || !newStudent) { showMsg('error', error?.message || 'Failed to add student'); setStudentSaving(false); return }
+
+        // Upload photo if provided and storage is available
+        try {
+            if (photoFile && (supabase as any).storage) {
+                const blob = await compressImage(photoFile)
+                const path = `students/${newStudent.id}.jpg`
+                await (supabase as any).storage.from('student-photos').upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+                const { data: pub } = (supabase as any).storage.from('student-photos').getPublicUrl(path)
+                if (pub?.publicUrl) {
+                    await supabase.from('students').update({ photo_url: pub.publicUrl }).eq('id', newStudent.id)
+                }
+            }
+        } catch {
+            // Non-fatal for local preview
+        }
 
         // Insert marks
         const markRows = subjects.map(s => ({ student_id: newStudent.id, subject_id: s.id, marks_obtained: marksInput[s.id] ?? 0 }))
@@ -159,7 +214,7 @@ export default function ClassDetailPage() {
         await upsertResultSummary(newStudent.id, subjects, marksInput)
 
         showMsg('success', 'Student added successfully!')
-        setStudentName(''); setStudentReg('')
+        setStudentName(''); setStudentReg(''); setStudentFather(''); setPhotoFile(null); setPhotoPreview(null)
         const reset: Record<string, number> = {}
         subjects.forEach(s => { reset[s.id] = 0 })
         setMarksInput(reset)
@@ -451,9 +506,50 @@ export default function ClassDetailPage() {
                                     onChange={e => setStudentName(e.target.value)} required />
                             </div>
                             <div className="form-group">
+                                <label className="form-label">Father Name</label>
+                                <input className="form-input" placeholder="Father's name" value={studentFather}
+                                    onChange={e => setStudentFather(e.target.value)} />
+                            </div>
+                            <div className="form-group">
                                 <label className="form-label">Admission Number</label>
                                 <input className="form-input" placeholder="e.g. ADM2024001" value={studentReg}
                                     onChange={e => setStudentReg(e.target.value)} required style={{ textTransform: 'uppercase' }} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Student Photo</label>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap'
+                                }}>
+                                    <div style={{
+                                        width: 80, height: 80, borderRadius: 10, border: '1px solid var(--border)',
+                                        background: '#fff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        {photoPreview ? (
+                                            <img src={photoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>No Photo</span>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={e => {
+                                            const f = e.target.files?.[0] || null
+                                            setPhotoFile(f)
+                                            setPhotoPreview(f ? URL.createObjectURL(f) : null)
+                                        }}
+                                        style={{
+                                            display: 'inline-block',
+                                            padding: '0.5rem',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: 8,
+                                            background: 'white'
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 6 }}>
+                                    JPEG/PNG accepted. Images auto-resized to ~256px and compressed before upload.
+                                </div>
                             </div>
                         </div>
 

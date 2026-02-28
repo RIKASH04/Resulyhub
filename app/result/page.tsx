@@ -12,7 +12,7 @@ interface Subject { id: string; name: string; max_marks: number }
 interface Mark { subject_id: string; marks_obtained: number; subjects: Subject }
 interface ResultSummary { total: number; max_total: number; percentage: number; grade: string; status: string }
 interface Student {
-    id: string; name: string; register_number: string;
+    id: string; name: string; register_number: string; father_name?: string; photo_url?: string;
     classes: { name: string }
     result_summary: ResultSummary[]
     marks: Mark[]
@@ -42,11 +42,24 @@ export default function ResultPage() {
 
         try {
             // 1. Fetch basic student information (maybeSingle returns null if not found, no error)
-            const { data: studentData, error: studentError } = await supabase
-                .from('students')
-                .select(`id, name, register_number, classes(name)`)
+            // Try with new columns; if not present, fallback
+            let studentData: any | null = null
+            let studentError: any | null = null
+            const try1 = await supabase.from('students')
+                .select(`id, name, register_number, father_name, photo_url, classes(name)`)
                 .eq('register_number', regNum)
                 .maybeSingle()
+            if (try1.error) {
+                studentError = try1.error
+                const try2 = await supabase.from('students')
+                    .select(`id, name, register_number, classes(name)`)
+                    .eq('register_number', regNum)
+                    .maybeSingle()
+                studentData = try2.data
+                studentError = try2.error
+            } else {
+                studentData = try1.data
+            }
 
             if (studentError) {
                 console.error('Error fetching student:', studentError.message)
@@ -232,7 +245,7 @@ export default function ResultPage() {
                                                 color: 'white', fontWeight: 800, fontSize: '1.5rem'
                                             }}>R</div>
                                         </div>
-                                        <h2 style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.01em', lineHeight: 1.3 }}>Hidayathul Islam Madrasa Purusharakatte - 9798</h2>
+                                        <h2 style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.01em', lineHeight: 1.3 }}>Himayathul Islam Madrasa Purusharakatte - 9798</h2>
                                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '0.2rem' }}>Official Academic Result Portal</p>
                                         <div style={{
                                             display: 'inline-block', marginTop: '0.75rem',
@@ -251,8 +264,14 @@ export default function ResultPage() {
                                         background: 'var(--bg)', padding: '1.25rem',
                                         borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)'
                                     }}>
+                                        {student.photo_url && (
+                                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
+                                                <img src={student.photo_url} alt="Student" style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 12, border: '1px solid var(--border)' }} />
+                                            </div>
+                                        )}
                                         {[
                                             { icon: User, label: 'Student Name', value: student.name },
+                                            { icon: User, label: 'Father Name', value: student.father_name || '—' },
                                             { icon: Hash, label: 'Admission Number', value: student.register_number },
                                             { icon: School, label: 'Class', value: student.classes?.name || '—' },
                                             { icon: Calendar, label: 'Academic Year', value: '2025–2026' },

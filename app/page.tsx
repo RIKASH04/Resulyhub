@@ -15,7 +15,7 @@ const FU = (delay: number) => ({
   transition: { duration: 0.5, delay }
 })
 
-const INSTITUTION_NAME = 'Hidayathul Islam Madrasa Purusharakatte - 9798'
+const INSTITUTION_NAME = 'Himayathul Islam Madrasa Purusharakatte - 9798'
 
 const features = [
   { icon: Search, title: 'Instant Results', desc: 'Search by Register Number and get your marksheet instantly.', color: '#4F46E5' },
