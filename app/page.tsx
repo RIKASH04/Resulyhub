@@ -180,6 +180,59 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── School / Institution Image ── */}
+        <section style={{ padding: '3rem 1.5rem 4rem', background: 'var(--bg-white)' }}>
+          <div className="container" style={{ textAlign: 'center' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              style={{
+                display: 'inline-block',
+                width: '100%',
+                maxWidth: '560px',
+                borderRadius: '18px',
+                overflow: 'hidden',
+                boxShadow: '0 8px 40px rgba(79,70,229,0.10)',
+                border: '1px solid var(--border)',
+                background: '#F1F5F9',
+              }}
+            >
+              {/* ─────────────────────────────────────────────────────────────
+                  Replace the src below with your actual image path.
+                  Example: src="/school.jpg"  (put the file in /public folder)
+              ──────────────────────────────────────────────────────────────── */}
+              <img
+                src="/addmission-2025.jpeg"
+                alt="Himayathul Islam Madrasa – Institution"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  /* Placeholder background shown when image is missing */
+                  minHeight: '180px',
+                  background: 'linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%)',
+                }}
+                onError={(e) => {
+                  /* If image fails to load, show a styled placeholder */
+                  const el = e.currentTarget as HTMLImageElement
+                  el.style.display = 'none'
+                  const parent = el.parentElement
+                  if (parent && !parent.querySelector('.img-fallback')) {
+                    const fb = document.createElement('div')
+                    fb.className = 'img-fallback'
+                    fb.style.cssText =
+                      'min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;color:#94A3B8;font-family:inherit;'
+                    fb.innerHTML =
+                      '<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-size:0.9rem;font-weight:600;">Your Image Goes Here</span><span style="font-size:0.78rem;">Place your file as <code style=\'background:#E2E8F0;padding:2px 6px;border-radius:4px\'>/public/home-image.png</code></span>'
+                    parent.appendChild(fb)
+                  }
+                }}
+              />
+            </motion.div>
+          </div>
+        </section>
 
       </main>
       <Footer />
