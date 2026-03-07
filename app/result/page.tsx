@@ -352,8 +352,8 @@ export default function ResultPage() {
                                         ))}
                                     </div>
 
-                                    {/* Print Button */}
-                                    <div className="no-print" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+                                    {/* Print + Certificate Buttons */}
+                                    <div className="no-print" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                                         <motion.button
                                             onClick={handlePrint}
                                             className="btn btn-secondary"
@@ -364,6 +364,8 @@ export default function ResultPage() {
                                             Print Marksheet
                                         </motion.button>
                                     </div>
+
+                                    {/* Certificate rendered directly via jsPDF — no hidden component needed */}
                                 </div>
                             </motion.div>
                         )}
