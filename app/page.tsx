@@ -139,98 +139,145 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features */}
-        <section style={{ padding: '4rem 1.5rem', background: 'var(--bg-white)' }}>
-          <div className="container">
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <h2 style={{ fontSize: '1.7rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-                Why ResultHub?
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.97rem' }}>
-                Everything you need to access your academic records.
-              </p>
-            </motion.div>
-
-            <div className="grid-3">
-              {features.map((f, i) => (
-                <motion.div key={f.title}
-                  className="card"
-                  style={{ textAlign: 'center', padding: '2rem' }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.12, duration: 0.5 }}
-                  whileHover={{ y: -4 }}
-                >
-                  <div style={{
-                    width: 56, height: 56,
-                    background: `${f.color}15`,
-                    borderRadius: 14,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 1.25rem',
-                  }}>
-                    <f.icon size={26} color={f.color} />
-                  </div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem' }}>{f.title}</h3>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Features removed as requested */}
 
         {/* ── School / Institution Image ── */}
         <section style={{ padding: '3rem 1.5rem 4rem', background: 'var(--bg-white)' }}>
           <div className="container" style={{ textAlign: 'center' }}>
+            {/* Class Toppers 2026 Section */}
             <motion.div
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              style={{
+              style={{ marginBottom: '4rem' }}
+            >
+              <h2 style={{ 
+                fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', 
+                fontWeight: 800, 
+                marginBottom: '1.5rem',
+                letterSpacing: '-0.02em',
+                background: 'linear-gradient(135deg, #2563EB, #3B82F6, #60A5FA)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                Class Toppers — 2026
+              </h2>
+              <div style={{
                 display: 'inline-block',
                 width: '100%',
-                maxWidth: '560px',
-                borderRadius: '18px',
+                maxWidth: '640px', // Reduced size for laptop screens
+                borderRadius: '24px',
                 overflow: 'hidden',
-                boxShadow: '0 8px 40px rgba(79,70,229,0.10)',
+                boxShadow: '0 12px 50px rgba(79,70,229,0.15)',
                 border: '1px solid var(--border)',
-                background: '#F1F5F9',
-              }}
-            >
-              {/* ─────────────────────────────────────────────────────────────
-                  Replace the src below with your actual image path.
-                  Example: src="/school.jpg"  (put the file in /public folder)
-              ──────────────────────────────────────────────────────────────── */}
-              <img
-                src="/addmission-2025.jpeg"
-                alt="Himayathul Islam Madrasa – Institution"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  /* Placeholder background shown when image is missing */
-                  minHeight: '180px',
-                  background: 'linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%)',
-                }}
-                onError={(e) => {
-                  /* If image fails to load, show a styled placeholder */
-                  const el = e.currentTarget as HTMLImageElement
-                  el.style.display = 'none'
-                  const parent = el.parentElement
-                  if (parent && !parent.querySelector('.img-fallback')) {
-                    const fb = document.createElement('div')
-                    fb.className = 'img-fallback'
-                    fb.style.cssText =
-                      'min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;color:#94A3B8;font-family:inherit;'
-                    fb.innerHTML =
-                      '<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-size:0.9rem;font-weight:600;">Your Image Goes Here</span><span style="font-size:0.78rem;">Place your file as <code style=\'background:#E2E8F0;padding:2px 6px;border-radius:4px\'>/public/home-image.png</code></span>'
-                    parent.appendChild(fb)
-                  }
-                }}
-              />
+                background: '#F8FAFC',
+              }}>
+                <img
+                  src="/toppers-2026.png"
+                  alt="Himayathul Islam Madrasa – Class Toppers 2026"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    minHeight: '200px',
+                    background: 'linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%)',
+                  }}
+                />
+              </div>
             </motion.div>
+
+            {/* Admission Open Title */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              style={{ marginBottom: '2.5rem' }}
+            >
+              <h2 style={{ 
+                fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
+                fontWeight: 900, 
+                letterSpacing: '-0.02em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                background: 'linear-gradient(135deg, #1E40AF, #3B82F6, #60A5FA)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                padding: '0.5rem 0',
+              }}>
+                Admissions Open for 2026
+              </h2>
+            </motion.div>
+
+            <div style={{ 
+              display: 'flex', 
+              gap: '2.5rem', 
+              justifyContent: 'center', 
+              flexWrap: 'wrap',
+              alignItems: 'flex-start'
+            }}>
+              {/* Poster 1 */}
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                style={{
+                  display: 'inline-block',
+                  width: '100%',
+                  maxWidth: '520px',
+                  borderRadius: '18px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 40px rgba(79,70,229,0.10)',
+                  border: '1px solid var(--border)',
+                  background: '#F1F5F9',
+                }}
+              >
+                <img
+                  src="/addmission-2025.jpeg"
+                  alt="Himayathul Islam Madrasa – Poster 1"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    minHeight: '180px',
+                    background: 'linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%)',
+                  }}
+                />
+              </motion.div>
+
+              {/* Poster 2 */}
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                style={{
+                  display: 'inline-block',
+                  width: '100%',
+                  maxWidth: '520px',
+                  borderRadius: '18px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 40px rgba(14,165,233,0.10)',
+                  border: '1px solid var(--border)',
+                  background: '#F1F5F9',
+                }}
+              >
+                <img
+                  src="/poster-2.png"
+                  alt="Himayathul Islam Madrasa – Poster 2"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    minHeight: '180px',
+                    background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
+                  }}
+                />
+              </motion.div>
+            </div>
           </div>
         </section>
 
